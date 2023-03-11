@@ -10,7 +10,7 @@ window.DoHandler = DoHandler
 const AddBTN = document.querySelector('.todo-button');
 let input = document.querySelector('.todo-input');
 let todoList = document.querySelector('.todo-list')
-
+let todoStatus = document.querySelector('.filter-todo')
 
 
 
@@ -45,12 +45,14 @@ switch (action.type) {
       return State
     }
     
-    case filterAllTodos:
-     
+    case filterAllTodos:{
+      return state
+    }
+      
     case filterCompletedTodos:
-     
+      return state
     case filterIncompletedTodos:
-     
+      return state     
         
 
     default:
@@ -62,10 +64,9 @@ switch (action.type) {
 let store = Redux.createStore(reducers)
 
 
-const getAllTodo = (GetState) =>{
+const getAllTodo = (todo) =>{
     todoList.innerHTML = ''
-    console.log(GetState);
-    GetState.forEach((element)=> {
+    todo.forEach((element)=> {
       
        todoList.insertAdjacentHTML(
         'beforeend',
@@ -87,18 +88,19 @@ const getAllTodo = (GetState) =>{
 
 function deleteHandler (id) {
   store.dispatch(RemoveTodoAction(id))
-    let GetState = store.getState()
-    console.log(GetState);
-  getAllTodo(GetState)
+    let todo = store.getState()
+    
+  getAllTodo(todo)
   
 }
 
 function DoHandler(id){
   store.dispatch(DoTodoAction(id))
-  let GetState = store.getState()
-  console.log(GetState);
-getAllTodo(GetState)
+  let todo= store.getState()
+
+getAllTodo(todo)
 }
+
 
 
 
@@ -106,8 +108,36 @@ AddBTN.addEventListener( 'click',(e)=>{
     e.preventDefault()
     let inputText = input.value.trim()
     store.dispatch(AddTodoAction(inputText))
-    let GetState = store.getState()
-    getAllTodo(GetState)
+    let todo = store.getState()
+    getAllTodo(todo)
 })
 
 
+todoStatus.addEventListener('change',(e)=>{
+  let getTodos = store.getState()
+  switch (e.target.value){
+    case 'all':
+      getAllTodo(getTodos)
+      store.dispatch({ type:filterAllTodos})
+
+      break
+
+    case 'completed':
+      
+      // store.dispatch({ type:filterCompletedTodos})
+      let isCompeletedTodos = getTodos.filter((todo)=>{
+          return todo.isCompleted == true
+      })
+      getAllTodo(isCompeletedTodos)
+      break
+
+    case'incomplete':
+      // store.dispatch({ type:filterIncompletedTodos})
+      let isInCompeletedTodos = getTodos.filter((todo)=>{
+          return todo.isCompleted == false
+      })
+      getAllTodo(isInCompeletedTodos)
+      break
+
+    }
+})
